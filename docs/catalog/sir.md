@@ -7,22 +7,33 @@ $$F(\dot{\mathbf{u}}(t),\mathbf{u}(t))=0$$
 
 with initial conditions (ICs) $\mathbf{u}(0)=\mathbf{u}_0$.
 
-We further assume to have $N_D$ data points, $ {\mathbf{v}}_{1}, \dots , {\mathbf{v}}_{N_D} $ (where ${\mathbf{v}}_i \in \mathbb{R}^m$)  collected in subsequent moments $ t_1, \dots, t_{D}$  (where $t_i\in[0,T]$). Each data point $\mathbf{v}_i$ is considered as a perturbed observation of the unknown variable $\mathbf{u}$ at time $t_i$ through a known observation operator $H$: \mathbb{R}^n \mathbb{R}^m$:
+We further assume to have $N_D$ data points, 
+$$\mathbf{v}_1 , \dots , \mathbf{v}_{N_D}$$
+(where $ \mathbf{v}_i \in \mathbb{R}^m $ )  collected in subsequent moments 
+$t_1, \dots, t_{D}$  (where $ t_i\in [0,T] $ ). 
+Each data point $\mathbf{v}_i$ is considered as a perturbed observation of the unknown variable $\mathbf{u}$ at time $t_i$ through a known observation operator $H$: $\mathbb{R}^n \rightarrow \mathbb{R}^m $ :
 
 $$\mathbf{v}_i=H(\mathbf{u}(t_i))+\boldsymbol{\epsilon}_i$$
 
 where $\boldsymbol{\epsilon}_i\in \mathbb{R}^m$ is a possible observation error.
 
-AnyPINN approximates (??) each component of (??) $\mathbf{u}(t)$ as a neural network $\hat{\mathbf{u}}(t,\boldsymbol{theta})$, where $\boldsymbol{theta}\in \mathbb{R}^{N_L}$ are the free parameters defined in the $N_L$ layers $N_N$ neurons of the NN. 
+AnyPINN approximates (??) each component of (??) $\mathbf{u}(t)$ as a neural network $\hat{\mathbf{u}}(t,\boldsymbol{\theta})$, where $\boldsymbol{\theta}\in \mathbb{R}^{N_L}$ are the free parameters defined in the $N_L$ layers $N_N$ neurons of the NN. 
 
-$\boldsymbol{theta}$ is trained by minimizing the loss function $\mathcal{L}$ that combines both a loss related to the physical equations, $\mathcal{L}^{\text{eq}}$, and a loss  related to the data, $\mathcal{L}^{\text{data}}$:
+$\boldsymbol{theta}$ is trained by minimizing the loss function $\mathcal{L}$ that combines the loss related to the physical equations, $\mathcal{L}^{\text{EQ}}$, the loss on the ICs, $\mathcal{L}^{\text{IC}}$ and a loss related to the data, $\mathcal{L}^{\text{DATA}}$:
 
-$$\mathcal{L}(\boldsymbol{theta})=\mathcal{L}^{\text{eq}} (\boldsymbol{theta}) + \mathcal{L}^{\text{data}} (\boldsymbol{theta})$$
+$$\mathcal{L}(\boldsymbol{\theta})=\mathcal{L}^{\text{EQ}} (\boldsymbol{\theta})+\mathcal{L}^{\text{IC}} (\boldsymbol{\theta}) + \mathcal{L}^{\text{DATA}} (\boldsymbol{\theta})$$
 
-The loss on the equations consists on the residual on $N_C$ collocation points, $\tau_1, \dots \tau_{N_C}$ (where $\tua_i \in [0,T]$):
+1) The loss on the equations consists on the squared residual on $N_C$ collocation points, $\tau_1, \dots \tau_{N_C}$ (where $\tau_i \in ]0,T]$):
 
-$$\mathcal{L}^{\text{eq}}(\boldsymbol{theta})=\frac{1}{N_C} \sum_{i=1}^{N_C} F(\dot{\hat{\mathbf{u}}}(\tau_i,\boldsymbol{theta}),\hat{\mathbf{u}}(\tau_i,\boldsymbol{theta}))$$
+$$\mathcal{L}^{\text{EQ}}(\boldsymbol{\theta})=\frac{1}{N_C} \sum_{i=1}^{N_C} \Vert F(\dot{\hat{\mathbf{u}}}(\tau_i,\boldsymbol{\theta}),\hat{\mathbf{u}}(\tau_i,\boldsymbol{\theta}))\Vert^2$$
 
+2) The loss on the ICs consists on the error on the initial conditions:
+
+$$\mathcal{L}^{\text{IC}}(\boldsymbol{\theta})=\Vert \hat{\mathbf{u}}(0, \boldsymbol{\theta})-u_0 \Vert^2 $$
+
+3) The loss on the data consists on the average discrepancy on the data:
+
+$$ \mathcal{L}^{\text{DATA}}(\boldsymbol{\theta})=\frac{1}{N_D} \sum_{i=1}^{N_D} \Vert \hat{\mathbf{u}}(t_i, \boldsymbol{\theta})-\mathbf{v}_i \Vert^2 $$
 
 
 # SIR Epidemic Model
